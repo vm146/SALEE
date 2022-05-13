@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="16dp"
+    tools:context=".MainActivity">
+
+    <!-- android:theme="@style/Button.White" -->
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="90dp"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="0dp"
+        android:shadowColor="@color/black"
+        android:gravity="center"
+        android:text="SALEE"
+        android:textSize="80dp" />
+
+    <TextView
+        android:id="@+id/instruction"
+        android:layout_width="match_parent"
+        android:layout_height="30dp"
+        android:layout_below="@+id/title"
+        android:layout_marginTop="10dp"
+        android:text="Enter IP address and port"
+        android:textSize="20dp" />
+
+    <EditText
+        android:id="@+id/IP"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/instruction"
+        android:layout_marginTop="0dp"
+        android:hint="0.0.0.0"
+        android:inputType="text" />
+
+    <EditText
+        android:id="@+id/Port"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/IP"
+        android:layout_marginTop="0dp"
+        android:hint="54322"
+        android:inputType="number" />
+
+    <Button
+        android:id="@+id/btnConnect"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/Port"
+        android:layout_gravity="center"
+        android:layout_marginTop="10dp"
+        android:backgroundTint="@color/myWhite"
+        android:text="Connect" />
+
+    <TextView
+        android:id="@+id/infoMessages"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/btnConnect"
+        android:inputType="textMultiLine"
+        android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium" />
+
+
+</RelativeLayout>

@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">SALEE</string>
+    <string name="edit_message">enter something</string>
+    <string name="edit_press">send</string>
+</resources>

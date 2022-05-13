@@ -1,0 +1,2 @@
+python3 recordingServer.py -s "10_min" --samplingrate_powermeter 2000 --measures_powermeter "v,i,p,q" -p 54322 --switch_on streamingData
+
