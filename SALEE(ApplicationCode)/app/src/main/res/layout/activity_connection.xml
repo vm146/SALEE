@@ -25,7 +25,8 @@
         android:layout_height="30dp"
         android:layout_weight="1"
         android:layout_gravity="center_horizontal|center"
-        android:text="Autolabeling: OFF"
+        android:text="Autolabeling: ON"
+        android:visibility="invisible"
         android:textSize="20sp"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>
 

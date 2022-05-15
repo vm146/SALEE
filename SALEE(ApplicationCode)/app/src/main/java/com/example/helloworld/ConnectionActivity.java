@@ -6,16 +6,12 @@ import static com.example.helloworld.NotificationApp.CHANNEL_1_ID;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
-import androidx.lifecycle.ProcessLifecycleOwner;
 
 import android.app.AlertDialog;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.TaskStackBuilder;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -25,7 +21,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -41,9 +36,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 import java.lang.Math;
-import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 public class ConnectionActivity extends AppCompatActivity {
@@ -69,7 +61,7 @@ public class ConnectionActivity extends AppCompatActivity {
     public Integer propTwoCounter = 0;
     public double truePosPropOne;
     public double truePosPropTwo;
-    public boolean autoLabelSwitch = false;
+    public boolean autoLabelSwitch = true;
 
     // boolean value: is app in foreground(active use) or background(passive use)
     // use for thread-safety atomic booleans
@@ -124,7 +116,6 @@ public class ConnectionActivity extends AppCompatActivity {
                 notificationManager.cancel(2);
 
                 HashMap<String, Float> event;
-                HashMap<String, Float> eventTwo;
 
                 boolean type;
 
@@ -132,10 +123,9 @@ public class ConnectionActivity extends AppCompatActivity {
 
                 // for testing
                 /*event = convStr("Up|16.40|2022.04.24 14:12:20", true);
-                eventTwo = convStr("Down|-18.40|2022.04.24 10:12:20", false);
 
                 eventQueue.add(event);
-                eventQueue.add(eventTwo);*/
+                */
 
 
                 while (eventQueue.size() > 0) {
@@ -144,11 +134,7 @@ public class ConnectionActivity extends AppCompatActivity {
                     Map.Entry<String, Float> entry = event.entrySet().iterator().next();
                     Float power = entry.getValue();
 
-                    if (power > 0) {
-                        type = true;
-                    } else {
-                        type = false;
-                    }
+                    type = power > 0;
                     // First two added appliances need to be labeled separately (for propositions)
                     if (appliances.size() < 2) {
                         showDialog(event, type);
@@ -161,20 +147,23 @@ public class ConnectionActivity extends AppCompatActivity {
                     @Override
                     public void run() {
                         infoMessagesTwo.setText("");
+                        unlabeled.setText("");
+                        unlabeled.append("Unlabeled events: " + eventQueue.size());
                     }
                 });
             }
         });
 
         autoLabelButton = findViewById(R.id.buttonAuto);
+        autoLabelButton.setVisibility(View.INVISIBLE); //HIDE the button
         autoLabelButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 autoLabelSwitch = !autoLabelSwitch;
-                if (!autoLabelSwitch) {
-                    autoLabelButton.setText("Autolabeling: OFF");
-                } else {
+                if (autoLabelSwitch) {
                     autoLabelButton.setText("Autolabeling: ON");
+                } else {
+                    autoLabelButton.setText("Autolabeling: OFF");
                 }
             }
         });
@@ -208,9 +197,9 @@ public class ConnectionActivity extends AppCompatActivity {
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        infoMessagesTwo.setText("Connection unsuccessful:\nGo back, " +
+                        infoMessagesTwo.setText("");
+                        infoMessagesTwo.append("Connection unsuccessful:\nGo back, " +
                                 "check your IP address/port and try again\n");
-                        unlabeled.setText("Unlabeled events: " + eventQueue.size());
                     }
                 });
                 e.printStackTrace();
@@ -231,12 +220,11 @@ public class ConnectionActivity extends AppCompatActivity {
                             @Override
                             public void run() {
                                 infoMessagesTwo.append(inMessage + "\n");
-                                infoMessagesTwo.append(truePosPropOne + "\n");
-                                infoMessagesTwo.append(truePosPropTwo + "\n");
-                                infoMessagesTwo.append(autoLabelQueue.size() + "\n");
+                                // infoMessagesTwo.append(truePosPropOne + "\n");
+                                // infoMessagesTwo.append(truePosPropTwo + "\n");
+                                // infoMessagesTwo.append(autoLabelQueue.size() + "\n");
                             }
                         });
-                        // TODO Set textview unlabeled counter directly on 0
                         // catch event
                         HashMap<String, Float> event;
                         if (inMessage.contains("Up")) {
@@ -245,29 +233,33 @@ public class ConnectionActivity extends AppCompatActivity {
 
                             if (autoLabelSwitch && truePosPropOne >= 0.8 ||
                                     autoLabelSwitch && truePosPropTwo >= 0.8) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //SHOW the button
+                                        autoLabelButton.setVisibility(View.VISIBLE);
+                                    }
+                                });
                                 autoLabel(event, true);
                             } else {
                                 sendNot("Up event detected", "Which appliance " +
                                         "was turned on?", 1);
-
                                 eventQueue.add(event);
                             }
 
-                            /*if (truePosPropOne < 0.8 && truePosPropTwo < 0.8 && !autoLabelSwitch) {
-                                sendNot("Up event detected", "Which appliance " +
-                                        "was turned on?", 1);
-
-                                eventQueue.add(event);
-
-                            } else {
-                                autoLabel(event, true);
-                            }*/
                         } else if (inMessage.contains("Down")) {
 
                             event = convStr(inMessage, false);
 
                             if (autoLabelSwitch && truePosPropOne >= 0.8 ||
                                     autoLabelSwitch && truePosPropTwo >= 0.8) {
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        //SHOW the button
+                                        autoLabelButton.setVisibility(View.VISIBLE);
+                                    }
+                                });
                                 autoLabel(event, true);
                             } else {
                                 sendNot("Up event detected", "Which appliance " +
@@ -275,16 +267,6 @@ public class ConnectionActivity extends AppCompatActivity {
 
                                 eventQueue.add(event);
                             }
-                            /*if (truePosPropOne < 0.8 && truePosPropTwo < 0.8) {
-                                sendNot("Down event detected", "Which appliance " +
-                                        "was turned off?", 1);
-
-
-                                eventQueue.add(event);
-
-                            } else {
-                                autoLabel(event, false);
-                            }*/
                         }
                         // Connection Error
                         else if (inMessage.contains("DEAD")) {
@@ -358,7 +340,7 @@ public class ConnectionActivity extends AppCompatActivity {
          *          difference(Float): difference of power consumption before and after event
          */
         HashMap<String, Float> event = new HashMap<>();
-        Float difference;
+        float difference;
         String eventTime;
         String cStringDiff;
         String cStringTime;
@@ -464,8 +446,6 @@ public class ConnectionActivity extends AppCompatActivity {
                     dialog.dismiss();
                     propOneCounter++;
                     truePosPropOne = propOneCounter / eventCounter;
-                    // infoMessagesTwo.append("truePos rate: " + truePosPropOne + "\n propOne: " +
-                    //        propOneCounter + "\n");
                     labelQueue.add(finalProp);
                     storeInList(appliances, finalProp, eventType, time, power);
                     saveList();
@@ -490,8 +470,6 @@ public class ConnectionActivity extends AppCompatActivity {
                     dialog.dismiss();
                     propTwoCounter++;
                     truePosPropTwo = propTwoCounter / eventCounter;
-                    // infoMessagesTwo.append("truePos2 rate: " + truePosPropTwo + "\n propTwo: " +
-                    //        propTwoCounter + "\n eventcounter: " + eventCounter + "\n");
                     labelQueue.add(finalPropTwo);
                     storeInList(appliances, finalPropTwo, eventType, time, power);
                     saveList();
@@ -751,8 +729,8 @@ public class ConnectionActivity extends AppCompatActivity {
         SharedPreferences prefs = PreferenceManager
                 .getDefaultSharedPreferences(this.getApplicationContext());
 
-        ArrayList<appliance> temp = new ArrayList<>();
-        ArrayList<appliance> tempTwo = new ArrayList<>();
+        ArrayList<appliance> temp;
+        ArrayList<appliance> tempTwo;
 
         // load eventCounter&co
         eventCounter = prefs.getFloat("eventCounter", 0f); // 0 if var not found
@@ -824,6 +802,4 @@ public class ConnectionActivity extends AppCompatActivity {
 }
 // TODO: test
 
-// TODO: Use Case for autolabeling:
 
-// TODO: Server needs to be stopped repeatedly

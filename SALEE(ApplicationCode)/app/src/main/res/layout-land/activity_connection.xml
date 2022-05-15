@@ -26,6 +26,7 @@
         android:layout_gravity="center_horizontal|center"
         android:text="Autolabeling: OFF"
         android:textSize="20sp"
+        android:visibility="invisible"
         android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"/>
 
     <TextView
