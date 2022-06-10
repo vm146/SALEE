@@ -1,3 +1,3 @@
-Module for semi-automatic labeling of events with energy-data (SALEE)
+Module for Semi-Automatic Labeling of Events in Energy Data (SALEE)
 
 PowermeterInterface is initially taken from @voelkerb and was modified. For more information visit the original repository: https://github.com/voelkerb/powermeterInterface
